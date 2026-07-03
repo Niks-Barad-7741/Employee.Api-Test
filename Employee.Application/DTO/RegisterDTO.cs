@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -18,7 +18,7 @@ namespace Employee.Application.DTO
         [Required]
         [EmailAddress]
         [StringLength(50)]
-        [RegularExpression(@"^[a-zA-Z0-9-._%+-]+@gmail\.com$")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string Email { get; set; }
 
         
