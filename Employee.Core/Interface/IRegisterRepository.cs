@@ -8,6 +8,7 @@ namespace Employee.Core.Interface
         Task<Employe> GetEmployeeByPhone(string phone);
         Task<bool> RegisterEmployeeAsync(Employe employe);
         Task<Role> GetRoleAsync(int roleId);
+        Task<Employe> GetEmployeByMail(string email);
 
 
         Task AssignRole(int employeeId, int roleId);

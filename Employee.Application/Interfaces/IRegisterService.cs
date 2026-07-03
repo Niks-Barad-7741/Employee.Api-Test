@@ -1,5 +1,6 @@
 ﻿using Employee.Application.DTO;
 using Employee.Core.Entities;
+using System.Globalization;
 
 namespace Employee.Application.Interfaces
 {
@@ -8,6 +9,7 @@ namespace Employee.Application.Interfaces
         Task<EmployeeDTO> GetEmployeeByPhone(string phone);
         Task<bool> RegisterEmployeeAsync(RegisterDTO dto);
         Task<Role> GetRoleAsync(int roleId);
+        Task<EmployeeDTO> GetEmployeByMail(string email);
 
 
         Task AssignRole(int employeeId, int roleId);

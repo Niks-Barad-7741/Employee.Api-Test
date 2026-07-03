@@ -1,4 +1,4 @@
-﻿using Employee.Core.Entities;
+using Employee.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +14,7 @@ namespace Employee.Core.Interface
         Task<Employe> GetEmployeeById(int id);
         Task<bool> UpdateEmployee(int id, Employe employe);
         Task<bool> DeleteEmployee(Employe employe);
+        Task<bool> IsPhoneRegisteredAsync(string phone, int currentEmployeeId);
 
         
     }

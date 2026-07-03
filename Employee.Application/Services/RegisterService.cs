@@ -48,5 +48,11 @@ namespace Employee.Application.Services
         {
             return await _repository.GetRoleAsync(roleId);
         }
+
+        public async Task<EmployeeDTO> GetEmployeByMail(string email)
+        {
+            var emp = await _repository.GetEmployeByMail(email);
+            return _mapper.Map<EmployeeDTO>(emp);
+        }
     }
 }

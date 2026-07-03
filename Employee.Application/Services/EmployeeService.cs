@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Employee.Application.DTO;
 using Employee.Application.Interfaces;
 using Employee.Core.Entities;
@@ -54,8 +54,25 @@ namespace Employee.Application.Services
 
         public async Task<bool> UpdateEmployee(int id, UpdateEmployeeDTO dto)
         {
-            var emp = _mapper.Map<Employe>(dto);
-            return await _employerepo.UpdateEmployee(id,emp);
+            var existingEmp = await _employerepo.GetEmployeeById(id);
+            if (existingEmp == null) 
+            {
+                return false;
+            }
+
+            var phoneExists = await _employerepo.IsPhoneRegisteredAsync(dto.Phone, id);
+            if (phoneExists)
+            {
+                throw new InvalidOperationException("Phone number is already registered by another employee.");
+            }
+
+            existingEmp.Name = dto.Name;
+            existingEmp.Email = dto.Email;
+            existingEmp.Phone = dto.Phone;
+            existingEmp.Department = dto.Department;
+            existingEmp.Salary = dto.Salary;
+
+            return await _employerepo.UpdateEmployee(id,existingEmp);
         }
     }
 }

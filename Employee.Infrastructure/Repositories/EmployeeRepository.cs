@@ -1,4 +1,4 @@
-﻿    using Employee.Core.Entities;
+    using Employee.Core.Entities;
     using Employee.Core.Interface;
     using Employee.Infrastructure.Data;
     using Microsoft.EntityFrameworkCore;
@@ -44,6 +44,11 @@
                 _context.Employee.Update(employe);
                 await _context.SaveChangesAsync();
                 return employe.Id == id;
+            }
+
+            public async Task<bool> IsPhoneRegisteredAsync(string phone, int currentEmployeeId)
+            {
+                return await _context.Employee.AnyAsync(emp => emp.Phone == phone && emp.Id != currentEmployeeId && !emp.IsDeleted);
             }
         }
     }

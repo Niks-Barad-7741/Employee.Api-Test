@@ -31,6 +31,11 @@ namespace Employee.Infrastructure.Repositories
                 .FirstOrDefaultAsync() ;
         }
 
+        public async Task<Employe> GetEmployeByMail(string email) 
+        {
+            return await _context.Employee.Where(n => n.Email.ToLower().Equals(email.ToLower()) && !n.IsDeleted)
+                .FirstOrDefaultAsync();
+        }
         public async Task<bool> RegisterEmployeeAsync(Employe employe)
         {
             await _context.Employee.AddAsync(employe);
