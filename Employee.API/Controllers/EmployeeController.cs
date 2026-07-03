@@ -1,4 +1,4 @@
-﻿using Employee.Application.DTO;
+using Employee.Application.DTO;
 using Employee.Application.Interfaces;
 using Employee.Core.Entities;
 using Employee.Core.Interface;
@@ -25,11 +25,11 @@ namespace Employee.API.Controllers
         public async Task<IActionResult> GettAllAsync()
         {
             var emp = await _employeeService.GetAllEmployee();
-            if (emp == null)
+            if (emp == null || emp.Count == 0)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return NotFound(new { Message = "No employees found" });
             }
-            return Ok(emp);
+            return Ok(new { Message = "Employees retrieved successfully", Data = emp });
         }
 
         [Authorize(Roles = "Admin,User")]
@@ -38,7 +38,7 @@ namespace Employee.API.Controllers
         {
             if (employee == null)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest(new { Message = "Invalid employee data" });
             }
             var employeec = new Employe
             {
@@ -51,11 +51,23 @@ namespace Employee.API.Controllers
             };
 
             var create = await _register.RegisterEmployeeAsync(employeec);
-            if (create == null)
+            if (!create)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest(new { Message = "Failed to create employee" });
             }
-            return Ok(create);
+            return Ok(new 
+            { 
+                Message = "Employee created successfully",
+                Employee = new 
+                {
+                    employeec.Id,
+                    employeec.Name,
+                    employeec.Email,
+                    employeec.Phone,
+                    employeec.Department,
+                    employeec.Salary
+                }
+            });
         }
 
 
@@ -66,9 +78,9 @@ namespace Employee.API.Controllers
             var emp = await _employeeService.GetEmployeeById(id);
             if (emp == null)
             {
-                return StatusCode(StatusCodes.Status404NotFound);
+                return NotFound(new { Message = "Employee not found" });
             }
-            return Ok(emp);
+            return Ok(new { Message = "Employee retrieved successfully", Data = emp });
         }
 
         [Authorize(Roles ="Admin,User")]
@@ -77,26 +89,46 @@ namespace Employee.API.Controllers
         {
             if (employee == null)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest(new { Message = "Invalid employee data" });
             }
-            var emp = await _employeeService.UpdateEmployee(id, employee);
-            if (!emp)
+            try
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                var emp = await _employeeService.UpdateEmployee(id, employee);
+                if (!emp)
+                {
+                    return BadRequest(new { Message = "Failed to update employee" });
+                }
+                return Ok(new { Message = "Employee updated successfully" });
             }
-            return Ok(emp);
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
 
         [Authorize(Roles ="Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
+
+            if (id <= 0)
+            {
+                return BadRequest(new { Message = "Invalid ID" });
+            }
+            var check = await _employeeService.GetEmployeeById(id);
+            if (check == null)
+            {
+                return NotFound(new { Message = "Employee not found" });
+            }
+
             var emp = await _employeeService.DeleteEmployee(id);
+
+            
             if (!emp)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest(new { Message = "Failed to delete employee" });
             }
-            return Ok(emp);
+            return Ok(new { Message = "Employee deleted successfully" });
         }
     }
 }

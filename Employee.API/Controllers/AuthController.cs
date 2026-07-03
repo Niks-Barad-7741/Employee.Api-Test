@@ -30,10 +30,16 @@ namespace Employee.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO dto)
         {
+            var existingemail = await _reg.GetEmployeByMail(dto.Email);
+            if (existingemail != null)
+            {
+                return Conflict(new { Message = "Maild id exists"});
+            }
+
             var existing = await _reg.GetEmployeeByPhone(dto.Phone);
             if (existing != null)
             {
-                return StatusCode(StatusCodes.Status409Conflict);
+                return Conflict(new { Message = "Phone number already exists" });
             }
 
             var empployee = new Employe
@@ -55,7 +61,10 @@ namespace Employee.API.Controllers
                 await _reg.AssignRole(empployee.Id, userrole.Id);
             }
 
-            return Ok("User Registerd Succesfully");
+            var role = await _login.GetEmployeeRole(empployee.Id);
+            var token = _jwtService.GenerateToken(empployee, role);
+
+            return Ok(new { Token = token, empid = empployee.Id, Email = empployee.Email, role = role.FirstOrDefault() });
         }
 
         [HttpPost("login")]
@@ -64,13 +73,14 @@ namespace Employee.API.Controllers
             var emp = await _login.GetEmployeByIdAsync(dto.Email);
             if(emp == null)
             {
-                return Unauthorized("Invalid email or password");
+                //return Unauthorized("Invalid email");
+                return Unauthorized(new { Message = "Invalid email" });
             }
 
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, emp.PasswordHash);
             if(!isPasswordValid)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized(new { Message = "Invalid password" });
             }
 
             var role = await _login.GetEmployeeRole(emp.Id);

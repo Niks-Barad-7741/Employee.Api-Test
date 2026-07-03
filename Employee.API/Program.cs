@@ -39,7 +39,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "StudentProj API",
+        Title = "Employee API",
         Version = "v1"
     });
 
